@@ -11,7 +11,7 @@ body { margin: 0; padding: 0; }
 #map { position: absolute; top: 0; bottom: 0; width: 100%; z-index: -1;}
 
 #tabs {
-    margin-bottom: 10px; z-index: 1;
+    margin: 10px; z-index: 1;
 }
 
 .tab {
@@ -96,7 +96,7 @@ function getColorForFrequency(frequency) {
         'B': '#7B68E4', // Medium Slate Blue
         'C': '#BA55E0', // Medium Orchid
         'D': '#FF69B4', // Hot Pink
-        'E': '#FF1493'  // Deep Pink
+        'E': '#FF69F4'  // Deep Pink
     };
     return colorMapping[frequency] || '#000000'; // Default color if not found
 }
@@ -122,23 +122,28 @@ function showLayer(layerId) {
 
 
 map.on('load', function () {
+    // Load the GeoJSON file for the garages
+    map.loadImage('https://docs.mapbox.com/mapbox-gl-js/assets/custom_marker.png', function (error, image) {
+        if (error) throw error;
+        map.addImage('custom-marker', image);
+        
         map.addSource('nyc-garages', {
             'type': 'geojson',
             'data': '../assets/DSNY Garages_20231207.geojson'
         });
 
+        // Add a layer to use the image to represent the data
         map.addLayer({
-            'id': 'garages',
-            'type': 'circle',
-            'source': 'nyc-garages', // Changed to the correct source reference
-            'paint': {
-                'circle-radius': 4,
-                'circle-color': '#B42222'
-            },
-            'filter': ['==', '$type', 'Point']
+            'id': 'markers',
+            'type': 'symbol',
+            'source': 'nyc-garages',
+            'layout': {
+                'icon-image': 'custom-marker',
+                'icon-size': 0.5
+            }
         });
-
- });
+    });
+});
 
  map.on('load', function () {
         // Add a new source from our local GeoJSON data and set the 'type' to 'geojson'.
@@ -161,7 +166,7 @@ map.on('load', function () {
         });
 
 
-    });
+});
 
 
 
