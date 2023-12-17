@@ -1,1 +1,1 @@
-# GarbageColletctionMap
+# GarbageCollectionMap
