@@ -69,7 +69,7 @@ map.on('load', function () {
     // Add source
     map.addSource('frequency-data', {
         'type': 'geojson',
-        'data': '../GarbageColletctionMap/assets/DSNY_Frequencies_GeoJSON.geojson'
+        'data': '../GarbageCollectionMap/assets/DSNY_Frequencies_GeoJSON.geojson'
     });
 
     // Loop through frequencies and add a layer for each
@@ -129,7 +129,7 @@ map.on('load', function () {
         
         map.addSource('nyc-garages', {
             'type': 'geojson',
-            'data': '../GarbageColletctionMap/assets/DSNY Garages_20231207.geojson'
+            'data': '../GarbageCollectionMap/assets/DSNY Garages_20231207.geojson'
         });
 
         // Add a layer to use the image to represent the data
@@ -149,7 +149,7 @@ map.on('load', function () {
         // Add a new source from our local GeoJSON data and set the 'type' to 'geojson'.
         map.addSource('nyc-sections', {
             'type': 'geojson',
-            'data': '../GarbageColletctionMap/assets/DSNY Districts_20231015.geojson'
+            'data': '../GarbageCollectionMap/assets/DSNY Districts_20231015.geojson'
         });
         
         // Now that the source is added, let's add a layer to visualize the GeoJSON data.
