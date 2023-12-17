@@ -8,11 +8,43 @@
 <script src="https://api.mapbox.com/mapbox-gl-js/v2.5.1/mapbox-gl.js"></script>
 <style>
 body { margin: 0; padding: 0; }
-#map { position: absolute; top: 0; bottom: 0; width: 100%; }
+#map { position: absolute; top: 0; bottom: 0; width: 100%; z-index: -1;}
+
+#tabs {
+    margin-bottom: 10px; z-index: 1;
+}
+
+.tab {
+    background-color: #f1f1f1;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 10px 15px;
+    transition: background-color 0.3s;
+}
+
+.tab:hover {
+    background-color: #ddd;
+}
+
+.tab.active {
+    background-color: #ccc;
+}
+
 </style>
 </head>
 <body>
-<div id="map"></div>
+    <div id="tabs">
+        <button class="tab" onclick="showLayer('frequency-A')">Mon, Wed, Fri</button>
+        <button class="tab" onclick="showLayer('frequency-B')">Tue, Thu, Sat</button>
+        <button class="tab" onclick="showLayer('frequency-C')">Mon, Thu</button>
+        <button class="tab" onclick="showLayer('frequency-D')">Tue, Fri</button>
+        <button class="tab" onclick="showLayer('frequency-E')">Wed, Sat</button>
+    </div>
+    <div id="map"></div>
+
+
+
 <script>
     mapboxgl.accessToken = 'pk.eyJ1IjoianozMDc3IiwiYSI6ImNqdHczOTkwbDBnOHM0Zm82cXo4anplbXYifQ.x1oWtwpzjoGcuqqh7ME79g';
     var map = new mapboxgl.Map({
@@ -30,40 +62,66 @@ body { margin: 0; padding: 0; }
 
     map.addControl(new mapboxgl.NavigationControl());
 
-    map.on('load', function () {
-        // Add a new source from our local GeoJSON data and set the 'type' to 'geojson'.
-        map.addSource('nyc-districts', {
-            'type': 'geojson',
-            'data': '../assets/DSNY Districts_20231015.geojson'
-        });
         
-        // Now that the source is added, let's add a layer to visualize the GeoJSON data.
-        map.addLayer({
-            'id': 'district-polygons',
-            'type': 'fill',
-            'source': 'nyc-districts',
-            'layout': {},
-            'paint': {
-                'fill-color': '#088',
-                'fill-opacity': 0.3,
-                'fill-outline-color': '#000'
-            }
-        });
+const frequencies = ['A', 'B', 'C', 'D', 'E'];
 
-        map.addLayer({
-            'id': 'district-outlines',
-            'type': 'line',
-            'source': 'nyc-districts',
-            'layout': {},
-            'paint': {
-                'line-color': '#000',
-                'line-width': 1
-            }
-        });
-
+map.on('load', function () {
+    // Add source
+    map.addSource('frequency-data', {
+        'type': 'geojson',
+        'data': '../assets/DSNY_Frequencies_GeoJSON.geojson'
     });
 
-    map.on('load', function () {
+    // Loop through frequencies and add a layer for each
+    frequencies.forEach(function(frequency) {
+        map.addLayer({
+            'id': 'frequency-' + frequency,
+            'type': 'fill',
+            'source': 'frequency-data',
+            'paint': {
+                // You can use a function or a mapping object to assign colors based on frequency
+                'fill-color': getColorForFrequency(frequency),
+                'fill-opacity': 0.4
+            },
+            'filter': ['==', ['get', 'FREQUENCY'], frequency]
+        });
+    });
+    showLayer('frequency-A');
+});
+
+// Function to get color based on frequency
+function getColorForFrequency(frequency) {
+    const colorMapping = {
+        'A': '#1E90FF', // Dodger Blue
+        'B': '#7B68E4', // Medium Slate Blue
+        'C': '#BA55E0', // Medium Orchid
+        'D': '#FF69B4', // Hot Pink
+        'E': '#FF1493'  // Deep Pink
+    };
+    return colorMapping[frequency] || '#000000'; // Default color if not found
+}
+
+function showLayer(layerId) {
+    const layers = ['frequency-A', 'frequency-B', 'frequency-C', 'frequency-D', 'frequency-E'];
+
+    // Hide all layers
+    layers.forEach(function(id) {
+        map.setLayoutProperty(id, 'visibility', 'none');
+    });
+
+    // Show the selected layer
+    map.setLayoutProperty(layerId, 'visibility', 'visible');
+
+    // Update tab classes
+    var tabs = document.getElementsByClassName('tab');
+    for (var i = 0; i < tabs.length; i++) {
+        tabs[i].className = tabs[i].className.replace(" active", "");
+    }
+    document.querySelector(`[onclick="showLayer('${layerId}')"]`).className += " active";
+}
+
+
+map.on('load', function () {
         map.addSource('nyc-garages', {
             'type': 'geojson',
             'data': '../assets/DSNY Garages_20231207.geojson'
@@ -80,7 +138,38 @@ body { margin: 0; padding: 0; }
             'filter': ['==', '$type', 'Point']
         });
 
+ });
+
+ map.on('load', function () {
+        // Add a new source from our local GeoJSON data and set the 'type' to 'geojson'.
+        map.addSource('nyc-sections', {
+            'type': 'geojson',
+            'data': '../assets/DSNY Districts_20231015.geojson'
+        });
+        
+        // Now that the source is added, let's add a layer to visualize the GeoJSON data.
+        map.addLayer({
+            'id': 'section-polygons',
+            'type': 'line',
+            'source': 'nyc-sections',
+            'layout': {},
+            'paint': {
+                'line-color': '#ffffff', // White color for the outline
+                'line-width': 0.2 // Width of the outline
+
+            }
+        });
+
+
     });
+
+
+
+
+
+
+
+
 </script>
  
 </body>
